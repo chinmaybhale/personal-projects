@@ -36,6 +36,15 @@ int Brawler::get_level(void) {
   return level;
 }
 
+string Brawler::get_name(void) {
+  /**
+   * get_name returns the name of the
+   * brawler.
+   */
+
+  return name;
+}
+
 int Brawler::CalcPowerPoints(void) {
   /**
    * CalcPowerPoints calculates the required
@@ -47,7 +56,7 @@ int Brawler::CalcPowerPoints(void) {
    * points of a brawler.
    */
 
-  return power_levels[level - 1] - power_points;
+  return power_levels[level] - power_points;
 }
 
 int Brawler::TotalPowerPoints(void) {
@@ -87,7 +96,7 @@ void Brawler::PrintBrawler(void) {
   if(level < 9) {
     cout << "Current Power Points: " << power_points << endl;
 
-    if(CalcPowerPoints() == 0) {
+    if(CalcPowerPoints() <= 0) {
       cout << "No additional Power Points required to reach level " << level + 1
            << "." << endl;
     }
@@ -103,10 +112,10 @@ void Brawler::PrintBrawler(void) {
   else {
     // brawlers that have reached level 9 or above receive a special message
     if(level == 9) {
-      cout << name << "has not acquired a Star Power." << endl;
+      cout << name << " has not acquired a Star Power." << endl;
     }
     else if(level == 10) {
-      cout << name << "has reached the maximum level and has a Star Power."
+      cout << name << " has reached the maximum level and has a Star Power."
            << endl;
     }
     else {
