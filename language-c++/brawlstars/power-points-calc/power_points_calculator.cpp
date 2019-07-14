@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include <cmath>
@@ -9,8 +10,10 @@ using namespace std;
 int AvgLevel(vector<Brawler>);
 int SumPowerPoints(vector<Brawler>);
 void PrintMenu(void);
-Brawler AddBrawler(void);
+void AddBrawler(vector<Brawler> *);
 int ConvertChoice(string);
+void RemoveBrawler(string, vector<Brawler> *);
+void PrintPretty(vector<Brawler> *);
 
 int main(void) {
   int active = 0;
@@ -28,7 +31,7 @@ int main(void) {
 
     switch(choice) {
     case 1: {
-      brawlers.push_back(AddBrawler());
+      AddBrawler(&brawlers);
     }
       break;
     case 2: {
@@ -80,10 +83,23 @@ int main(void) {
     }
       break;
     case 4: {
-      active = -1;
+      // prompt for brawler to remove
+      cout << "Please enter the brawler to remove." << endl << ">> ";
+      string rm_brawler;
+      cin >> rm_brawler;
+
+      RemoveBrawler(rm_brawler, &brawlers);
     }
       break;
     case 5: {
+      PrintPretty(&brawlers);
+    }
+      break;
+    case 6: {
+      active = -1;
+    }
+      break;
+    case 7: {
       PrintMenu();
     }
       break;
@@ -104,15 +120,35 @@ void PrintMenu(void) {
 
   cout << "##################################################" << endl;
   cout << "-- POWER POINTS CALCULATOR MENU --" << endl;
-  cout << "A: Add a brawler." << endl;
-  cout << "B: Display a brawler's information." << endl;
-  cout << "D: Display collective results of brawlers added." << endl;
-  cout << "Q: Quit program." << endl;
-  cout << "?: Display context menu." << endl;
+  cout << "A: Add a brawler." << endl;                                 // 1
+  cout << "B: Display a brawler's information." << endl;               // 2
+  cout << "D: Display collective results of brawlers added." << endl;  // 3
+  cout << "R: Removes a brawler by name (case-sensitive)." << endl;    // 4
+  cout << "T: Displays a table of all brawlers added." << endl;        // 5
+  cout << "Q: Quit program." << endl;                                  // 6
+  cout << "?: Display context menu." << endl;                          // 7
   cout << "##################################################" << endl;
 
 }
 
+void PrintPretty(vector<Brawler> * brawlers_ptr) {
+  /**
+   * PrintPretty displays a table of all brawlers added with
+   * relevant information added.
+   *
+   * @param brawlers_ptr: Represents the address of the brawlers
+   * vector.
+   */
+
+  cout << "============================================" << endl;
+  cout << "BRAWLER\t\tLEVEL\t\tPOWER POINTS" << endl;
+  cout << "============================================" << endl;
+  for(int i = 0; i < brawlers_ptr->size(); i++) {
+    cout << left << setw(18) << setfill(' ') << brawlers_ptr->at(i).get_name();
+    cout << left << setw(18) << setfill(' ') << brawlers_ptr->at(i).get_level();
+    cout << left << setw(10) << setfill(' ') << brawlers_ptr->at(i).get_power() << endl;
+  }
+}
 int ConvertChoice(string response) {
   /**
    * ConvertChoice converts the string response
@@ -133,18 +169,25 @@ int ConvertChoice(string response) {
   else if(response == "D") {
     return 3;
   }
-  else if(response == "Q") {
+  else if(response == "R") {
     return 4;
   }
-  else if(response == "?") {
+  else if(response == "T") {
     return 5;
+  }
+  else if(response == "Q" || response == "q" || response == "quit"
+          || response == "QUIT" || response == "exit" || response == "EXIT") {
+    return 6;
+  }
+  else if(response == "?") {
+    return 7;
   }
   else {
     return -1;
   }
 }
 
-Brawler AddBrawler(void) {
+void AddBrawler(vector<Brawler> * brawlers_ptr) {
   /**
    * AddBrawler prompts user through a series of
    * questions to build a new brawler with the correct
@@ -183,7 +226,23 @@ Brawler AddBrawler(void) {
   // create a brawler
   Brawler new_brawler(brawler_name, brawler_level, brawler_power_points);
 
-  return new_brawler;
+  brawlers_ptr->push_back(new_brawler);
+}
+
+void RemoveBrawler(string brawler, vector<Brawler> * brawlers_ptr) {
+  /**
+   * RemoveBrawler traverses the vector and searches for the brawler
+   * with the given name and removes it from the vector.
+   *
+   * @param brawler: Represents the brawler to be removed.
+   * @param temp_brawlers: Represents the list of brawlers.
+   */
+
+  for(int i = 0; i < brawlers_ptr->size(); i++) {
+    if(brawler == brawlers_ptr->at(i).get_name()) {
+      brawlers_ptr->erase(brawlers_ptr->begin() + i);
+    }
+  }
 }
 int AvgLevel(vector<Brawler> temp_brawlers) {
   /**

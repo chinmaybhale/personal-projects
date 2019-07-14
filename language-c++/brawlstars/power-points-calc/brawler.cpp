@@ -45,6 +45,14 @@ string Brawler::get_name(void) {
   return name;
 }
 
+int Brawler::get_power(void) {
+  /**
+   * get_power returns the amount of
+   * power points the brawler currently has.
+   */
+
+  return power_points;
+}
 int Brawler::CalcPowerPoints(void) {
   /**
    * CalcPowerPoints calculates the required
