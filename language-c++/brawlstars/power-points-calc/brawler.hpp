@@ -16,6 +16,7 @@ public:
   Brawler(void);
   Brawler(string, int, int);
   int get_level(void);
+  string get_name(void);
   int CalcPowerPoints(void);
   int TotalPowerPoints(void);
   void PrintBrawler(void);
