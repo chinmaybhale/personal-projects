@@ -104,7 +104,7 @@ int main(void) {
     }
   }
 
-  printf("\nGAME OVER.\n");
+  printf("\nGAME OVER!\n");
   return 0;
 }
 
@@ -133,6 +133,7 @@ bool checkChoiceOpen(int choice, int nRows, int nCols,
     printf("Sorry. That position doesn't exist.\n");
     return false;
   }
+
   /* traverse board */
   for(row = 0; row < nRows; ++row) {
     for(column = 0; column < nCols; ++column) {
