@@ -12,6 +12,11 @@ void moveCursor(int nRows, int nCols, int grid[nRows][nCols]);
 int getCursorPosition(int nRows, int nCols, int grid[nRows][nCols]);
 void setCursorPosition(int cursorPosition, int direction, int nRows, int nCols,
                        int grid[nRows][nCols]);
+void initObstacles(int numObstacles, int nRows, int nCols,
+                   int grid[nRows][nCols]);
+void moveObstacles(int nRows, int nCols, int grid[nRows][nCols]);
+int checkBorder(int xPosition, int yPosition, int nRows, int nCols);
+void checkConditions(int nRows, int nCols, int grid[nRows][nCols]);
 
 /* global variable(s) */
 bool g_active = true;
@@ -35,12 +40,11 @@ int main(void) {
 
   // main loop
   while(g_active) {
-    printf("Cursor Position Before Move: %d\n",
-           getCursorPosition(grid_size, grid_size, grid));
     moveCursor(grid_size, grid_size, grid);
+    moveObstacles(grid_size, grid_size, grid);
     drawGrid(grid_size, grid_size, grid);
-    printf("Cursor Position After Move: %d\n",
-           getCursorPosition(grid_size, grid_size, grid));
+    printf("=========================================\n");
+    checkConditions(grid_size, grid_size, grid);
   }
 
   return 0;
@@ -73,6 +77,35 @@ void initGrid(int nRows, int nCols, int grid[nRows][nCols]) {
   int goalCol = rand() % nCols;
 
   grid[goalRow][goalCol] = 2;
+
+  // add obstacles
+  initObstacles(nRows, nRows, nCols, grid);
+}
+
+void initObstacles(int numObstacles, int nRows, int nCols,
+                   int grid[nRows][nCols]) {
+  /**
+   * initObstacles places obstacles at various indices
+   * of the grid.
+   *
+   * @param numObstacles: Represents the number of obstacles to add
+   * @param nRows: Represents the number of rows in the grid.
+   * @param nCols: Represents teh number of columns in the grid.
+   * @param grid: Represents the multi-dimensional array.
+   */
+
+  auto int numGenerated = 0;
+  auto int xPosition, yPosition;
+
+  while(numGenerated < numObstacles) {
+    xPosition = rand() % nRows;
+    yPosition = rand() % nCols;
+
+    if(grid[xPosition][yPosition] == 0) {
+      grid[xPosition][yPosition] = 3;
+      ++numGenerated;
+    }
+  }
 }
 
 void drawGrid(int nRows, int nCols, int grid[nRows][nCols]) {
@@ -95,6 +128,9 @@ void drawGrid(int nRows, int nCols, int grid[nRows][nCols]) {
         printf("[*] ");
       }
       else if(grid[row][column] == 2) {
+        printf("[x] ");
+      }
+      else if(grid[row][column] == 3) {
         printf("[#] ");
       }
       else {
@@ -223,5 +259,161 @@ void setCursorPosition(int cursorPosition, int direction, int nRows,
 
       ++gridPosition;
     }
+  }
+}
+
+void moveObstacles(int nRows, int nCols, int grid[nRows][nCols]) {
+  /**
+   * moveObstacles traverses the grid and moves every obstacle to a
+   * random adjacent position, or maintain position.
+   *
+   * @param nRows: Represents the number of rows in the grid.
+   * @param nCols: Represents teh number of columns in the grid.
+   * @param grid: Represents the multi-dimensional array.
+   */
+
+  auto int row, column, choice;
+
+  for(row = 0; row < nRows; ++row) {
+    for(column = 0; column < nCols; ++column) {
+      if(grid[row][column] == 3) {
+        grid[row][column] = 0; // reset current position
+
+        // check for border
+        if(checkBorder(row, column, nRows, nCols) != 0) {
+          if(checkBorder(row, column, nRows, nCols) == 1) {
+            if(grid[row][column - 1] != 2) {
+              grid[row][column - 1] = 3;
+            }
+          }
+          else if(checkBorder(row, column, nRows, nCols) == 2) {
+            if(grid[row + 1][column] != 2) {
+              grid[row + 1][column] = 3;
+            }
+          }
+          else if(checkBorder(row, column, nRows, nCols) == 3) {
+            if(grid[row][column + 1] != 2) {
+              grid[row][column + 1] = 3;
+            }
+          }
+          else if(checkBorder(row, column, nRows, nCols) == 4) {
+            if(grid[row - 1][column] != 2) {
+              grid[row - 1][column] = 3;
+            }
+          }
+          else {
+            grid[row][column] = 3;
+          }
+        }
+        else {
+          // set new position
+          choice = rand() % 4;
+
+          switch(choice) {
+          case 0: {
+            if(grid[row][column + 1] != 2) {
+              grid[row][column + 1] = 3; // move right
+            }
+          }
+            break;
+          case 1: {
+            if(grid[row - 1][column] != 2) {
+              grid[row - 1][column] = 3; // move up
+            }
+          }
+            break;
+          case 2: {
+            if(grid[row][column - 1] != 2) {
+              grid[row][column - 1] = 3; // move left
+            }
+          }
+            break;
+          case 3: {
+            if(grid[row + 1][column] != 2) {
+              grid[row + 1][column] = 3; // move down
+            }
+          }
+            break;
+          default: {
+            grid[row][column] = 3;     // maintain position
+          }
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+int checkBorder(int xPosition, int yPosition, int nRows, int nCols) {
+  /**
+   * checkBorder recieves a position and checks if that position
+   * is located on a particular border. checkBorder then returns
+   * the appropriate value that represents the border.
+   *
+   * 0: no border, 1: right border, 2: top border, 3: left border,
+   * 4: bottom border.
+   *
+   * @param xPosition: Represents the elements row value.
+   * @param yPosition: Represents the elements column value.
+   * @param nRows: Represents the number of rows in the grid.
+   * @param nCols: Represents teh number of columns in the grid.
+   * @param grid: Represents the multi-dimensional array.
+   */
+
+  auto int borderValue;
+
+  // check intersections
+  if(xPosition == 0) {
+    borderValue = 2;
+  }
+  else if(xPosition == nRows) {
+    borderValue = 4;
+  }
+  else if(yPosition == 0) {
+    borderValue = 3;
+  }
+  else if(yPosition == nCols) {
+    borderValue = 1;
+  }
+  else {
+    borderValue = 0;
+  }
+
+  return borderValue;
+}
+
+void checkConditions(int nRows, int nCols, int grid[nRows][nCols]) {
+  /**
+   * checkConditions traverses the grid and checks for the following:
+   * 1. cursor exists
+   * 2. exit exists
+   *
+   * @param nRows: Represents the number of rows in the grid.
+   * @param nCols: Represents teh number of columns in the grid.
+   * @param grid: Represents the multi-dimensional array.
+   */
+
+  auto int row, column;
+  auto bool cursorExists = false, exitExists = false;
+
+  for(row = 0; row < nRows; ++row) {
+    for(column = 0; column < nCols; ++column) {
+      if(grid[row][column] == 1) {
+        cursorExists = true;
+      }
+      else if(grid[row][column] == 2) {
+        exitExists = true;
+      }
+    }
+  }
+
+  if(!cursorExists) {
+    printf("Game Over. You died.\n");
+    g_active = false;
+  }
+  else if(!exitExists) {
+    printf("You escaped. You win!\n");
+    g_active = false;
   }
 }
