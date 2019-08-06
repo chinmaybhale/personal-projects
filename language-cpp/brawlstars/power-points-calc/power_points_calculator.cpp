@@ -17,6 +17,7 @@ void PrintPretty(vector<Brawler> *);
 void printBrawlerInfo(vector<Brawler>);
 int findBrawler(vector<Brawler>, string);
 void printCollection(vector<Brawler>);
+void printLevels(vector<Brawler>);
 
 int main(void) {
   int active = 0;
@@ -46,6 +47,10 @@ int main(void) {
     }
       break;
     case 4: {
+      printLevels(brawlers);
+    }
+      break;
+    case 5: {
       // prompt for brawler to remove
       cout << "Please enter the brawler to remove." << endl << ">> ";
       string rm_brawler;
@@ -54,21 +59,22 @@ int main(void) {
       RemoveBrawler(rm_brawler, &brawlers);
     }
       break;
-    case 5: {
+    case 6: {
       PrintPretty(&brawlers);
     }
       break;
-    case 6: {
+    case 7: {
       active = -1;
     }
       break;
-    case 7: {
+    case 8: {
       PrintMenu();
     }
       break;
     case -1: {
       cout << "That is not an option in the menu. Please try another." << endl;
     }
+      break;
     }
   }
 
@@ -86,10 +92,11 @@ void PrintMenu(void) {
   cout << "A: Add a brawler." << endl;                                 // 1
   cout << "B: Display a brawler's information." << endl;               // 2
   cout << "D: Display collective results of brawlers added." << endl;  // 3
-  cout << "R: Removes a brawler by name (case-sensitive)." << endl;    // 4
-  cout << "T: Displays a table of all brawlers added." << endl;        // 5
-  cout << "Q: Quit program." << endl;                                  // 6
-  cout << "?: Display context menu." << endl;                          // 7
+  cout << "L: Displays collective levels of brawlers added." << endl;  // 4
+  cout << "R: Removes a brawler by name (case-sensitive)." << endl;    // 5
+  cout << "T: Displays a table of all brawlers added." << endl;        // 6
+  cout << "Q: Quit program." << endl;                                  // 7
+  cout << "?: Display context menu." << endl;                          // 8
   cout << "##################################################" << endl;
 
 }
@@ -133,18 +140,21 @@ int ConvertChoice(string response) {
   else if(response == "D") {
     return 3;
   }
-  else if(response == "R") {
+  else if(response == "L") {
     return 4;
   }
-  else if(response == "T") {
+  else if(response == "R") {
     return 5;
+  }
+  else if(response == "T") {
+    return 6;
   }
   else if(response == "Q" || response == "q" || response == "quit"
           || response == "QUIT" || response == "exit" || response == "EXIT") {
-    return 6;
+    return 7;
   }
   else if(response == "?") {
-    return 7;
+    return 8;
   }
   else {
     return -1;
@@ -343,7 +353,10 @@ int findBrawler(vector<Brawler> brawlers, string brawler_name) {
 
 void printCollection(vector<Brawler> brawlers) {
   /**
-   * printCollection...
+   * printCollection displays collective results, calculations,
+   * and averages of all the added brawlers.
+   *
+   * @param brawlers: Represents a vector of brawler objects.
    */
 
   cout << "============================================" << endl;
@@ -394,4 +407,40 @@ void printCollection(vector<Brawler> brawlers) {
     }
   }
   cout << "============================================" << endl;
+}
+
+void printLevels(vector<Brawler> brawlers) {
+  /**
+   * printLevels displays the count of levels for all added
+   * brawers.
+   *
+   * @param brawlers: Represents a vector of brawler objects.
+   */
+
+  int countLevels[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  for(int i = 0; i < brawlers.size(); i++) {
+    countLevels[brawlers.at(i).get_level() - 1]++;
+  }
+
+  for(int i = 0; i < 9; i++) {
+    cout << "Level " << (i + 1) << "'s:  ";
+
+    for(int j = 1; j <= countLevels[i]; j++) {
+      cout << "*";
+    }
+
+    // next level
+    cout << " (" << countLevels[i] << ")" << endl;
+  }
+
+  cout << "Level 10's: ";
+  for(int i = 1; i <= countLevels[9]; i++) {
+    cout << "*";
+  }
+
+  // last level
+  cout << " (" << countLevels[9] << ")" << endl;
+
+  cout << "-------------------------------------------------------" << endl;
 }
