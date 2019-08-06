@@ -52,8 +52,9 @@ int main(void) {
       break;
     case 5: {
       // prompt for brawler to remove
-      cout << "Please enter the brawler to remove." << endl << ">> ";
       string rm_brawler;
+
+      cout << "Please enter the brawler to remove." << endl << ">> ";
       cin >> rm_brawler;
 
       RemoveBrawler(rm_brawler, &brawlers);
