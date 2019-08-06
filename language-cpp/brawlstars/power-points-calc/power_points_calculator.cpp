@@ -14,6 +14,8 @@ void AddBrawler(vector<Brawler> *);
 int ConvertChoice(string);
 void RemoveBrawler(string, vector<Brawler> *);
 void PrintPretty(vector<Brawler> *);
+void printBrawlerInfo(vector<Brawler> *);
+int findBrawler(vector<Brawler> *, string);
 
 int main(void) {
   int active = 0;
@@ -24,7 +26,7 @@ int main(void) {
   PrintMenu();
 
   while(active == 0) {
-    // prompt
+    // repeating prompt
     cout << "Please make a selection from the menu." << endl << ">> ";
     cin >> selection;
     int choice = ConvertChoice(selection);
@@ -35,45 +37,7 @@ int main(void) {
     }
       break;
     case 2: {
-      int found = -1;
-      string brawler_name;
-      cout << "Please enter your brawlers name (case-sensitive)*";
-      cout << endl << "Enter 'all' to view all brawler's indiviual info."
-           << endl << ">> ";
-      cin >> brawler_name;
-
-      // search for brawler and print information
-      if(brawlers.size() > 0) {
-        if(brawler_name == "all") {
-          cout << "--------------------------------------------------" << endl;
-          for(int i = 0; i < brawlers.size(); i++) {
-            cout << "BRAWLER #" << i + 1 << ":" << endl;
-            brawlers.at(i).PrintBrawler();
-
-            cout << "--------------------------------------------------"
-                 << endl;
-          }
-        }
-        else {
-          cout << "--------------------------------------------------" << endl;
-          for(int i = 0; i < brawlers.size(); i++) {
-            if(brawler_name == brawlers.at(i).get_name()) {
-              brawlers.at(i).PrintBrawler();
-              found = 0;
-            }
-          }
-
-          if(found == -1) {
-            cout << brawler_name << " does not exist." << endl;
-          }
-
-          cout << "--------------------------------------------------" << endl;
-        }
-      }
-      else {
-        cout << "No brawlers added yet. Tip: Type 'A' to add a new brawler."
-             << endl;
-      }
+      printBrawlerInfo(&brawlers);
     }
       break;
     case 3: {
@@ -176,6 +140,7 @@ void PrintPretty(vector<Brawler> * brawlers_ptr) {
     cout << left << setw(10) << setfill(' ') << brawlers_ptr->at(i).get_power() << endl;
   }
 }
+
 int ConvertChoice(string response) {
   /**
    * ConvertChoice converts the string response
@@ -224,13 +189,17 @@ void AddBrawler(vector<Brawler> * brawlers_ptr) {
    */
 
   string brawler_name;
-  int brawler_level;
-  int brawler_power_points;
-  int brawler_star_count;
 
+  // init default value(s)
+  int brawler_level = 1;
+  int brawler_power_points = 0;
+  int brawler_star_count = 0;
+
+  /* NAME */
   cout << "Please enter Brawler's name w/o spaces (i.e. ElPrimo, Nita)." << endl << ">> ";
   cin >> brawler_name;
 
+  /* POWER LEVEL */
   while(true) {
     cout << "Please enter " << brawler_name << "'s power level." << endl << ">> ";
     cin >> brawler_level;
@@ -244,22 +213,27 @@ void AddBrawler(vector<Brawler> * brawlers_ptr) {
     }
   }
 
+  /* STAR POWER(S) */
   if(brawler_level == 10) {
-    cout << "How many Star Powers does " << brawler_name << "have?" << endl;
+    cout << "How many Star Powers does " << brawler_name << " have?" << endl;
     cout << ">> ";
     cin >> brawler_star_count;
   }
 
-  cout << "Please enter " << brawler_name << "'s current power points "
-       << "achieved towards the next level." << endl << ">> ";
-  cin >> brawler_power_points;
+  /* POWER POINTS */
+  if(brawler_level < 9) {
+    cout << "Please enter " << brawler_name << "'s current power points "
+         << "achieved towards the next level." << endl << ">> ";
+    cin >> brawler_power_points;
+  }
 
   // break
   cout << "---" << endl;
 
-  // create a brawler
+  // create the brawler
   Brawler new_brawler(brawler_name, brawler_level, brawler_power_points, brawler_star_count);
 
+  // add the brawler
   brawlers_ptr->push_back(new_brawler);
 }
 
@@ -278,6 +252,7 @@ void RemoveBrawler(string brawler, vector<Brawler> * brawlers_ptr) {
     }
   }
 }
+
 int AvgLevel(vector<Brawler> temp_brawlers) {
   /**
    * AvgLevel calculates the average level of
@@ -319,4 +294,79 @@ int SumPowerPoints(vector<Brawler> temp_brawlers) {
   }
 
   return power_sum;
+}
+
+void printBrawlerInfo(vector<Brawler> * brawler_ptr) {
+  /**
+   * printBrawlerInfo displays the appropriate info of an individual
+   * brawler.
+   *
+   * @param brawler_ptr: Represents a pointer to the base address of the
+   * brawler vector.
+   */
+
+  string brawler_name;
+
+  // prompt for name
+  cout << "Please enter your brawlers name (case-sensitive)*";
+  cout << endl << "Enter 'all' to view all brawler's indiviual info."
+       << endl << ">> ";
+  cin >> brawler_name;
+
+  // check if any brawlers have been added
+  if(brawler_ptr->size() < 1) {
+    cout << "No brawlers added. Tip: Type 'A' to add a new brawler." << endl;
+  }
+  else {
+    // check if every brawler info is to be printed
+    if(brawler_name == "all") {
+      cout << "-------------------------------------------------------" << endl;
+      for(int brawlerIndex = 0; brawlerIndex < brawler_ptr->size();
+          brawlerIndex++) {
+        cout << "BRAWLER #" << brawlerIndex + 1 << ":" << endl;
+        brawler_ptr->at(brawlerIndex).PrintBrawler();
+
+        cout << "--------------------------------------------------------"
+             << endl;
+      }
+    }
+    else {
+      // single brawler to be printed
+      cout << "-------------------------------------------------------" << endl;
+      if(findBrawler(brawler_ptr, brawler_name) != -1) {
+        // brawler exists
+        brawler_ptr->at(findBrawler(brawler_ptr, brawler_name)).PrintBrawler();
+      }
+      else {
+        // brawler does NOT exist
+        cout << brawler_name << " does not exist.\n" << endl;
+      }
+
+      cout << "-------------------------------------------------------" << endl;
+    }
+  }
+}
+
+int findBrawler(vector<Brawler> * brawler_ptr, string brawler_name) {
+  /**
+   * findBrawler traverses a vector of brawlers and searches
+   * for the a brawler with the matching name. The index of the brawler
+   * is then returned.
+   *
+   * @param brawler_ptr: Represents a pointer to the base address of the
+   * brawler vector.
+   * @param brawler_name: Represents the brawler to be searched for.
+   * @return: Represents the index of the located brawler - returns -1
+   * when no brawler matching the name is found.
+   */
+
+  int i = -1;
+
+  for(i = 0; i < brawler_ptr->size(); i++) {
+    if(brawler_ptr->at(i).get_name() == brawler_name) {
+      return i;
+    }
+  }
+
+  return -1;
 }
