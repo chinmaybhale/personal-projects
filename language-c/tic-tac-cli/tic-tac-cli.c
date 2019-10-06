@@ -16,7 +16,7 @@ char g_playerTwoSym;
 bool g_playerOneTurn = true;
 
 int main(void) {
-  int boardSize;
+  int boardSize = 3;
   int choice;
   bool gameFlag = true;
   int turnCounter = 1;
