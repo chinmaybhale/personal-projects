@@ -5,6 +5,7 @@
 int pickPos(void);
 int checkOneWin(int nRows, int nCols, int board[nRows][nCols]);
 int checkTwoWin(int nRows, int nCols, int board[nRows][nCols]);
+int checkWin(int player, int nRows, int nCols, int board[nRows][nCols]);
 bool checkChoiceOpen(int, int nRows, int nCols, int board[nRows][nCols]);
 void translateChoice(int, int nRows, int nCols, int board[nRows][nCols]);
 void drawBoard(int nRows, int nCols, int board[nRows][nCols]);
@@ -156,56 +157,24 @@ bool checkChoiceOpen(int choice, int nRows, int nCols,
 }
 
 int checkOneWin(int nRows, int nCols, int board[nRows][nCols]) {
-  auto int row, column;
-
-  /* player one win condition(s) */
-  // horizontal check
-  for(row = 0; row < nRows; ++row) {
-    for(column = 0; column < nCols - 2; ++column) {
-      if(board[row][column + 0] == 1)
-        if(board[row][column + 1] == 1)
-          if(board[row][column + 2] == 1) {
-            return 1;
-          }
-    }
-  }
-
-  // vertical check
-  for(column = 0; column < nCols; ++column) {
-    for(row = 0; row < nRows - 2; ++row) {
-      if(board[row + 0][column] == 1)
-        if(board[row + 1][column] == 1)
-          if(board[row + 2][column] == 1) {
-            return 1;
-          }
-    }
-  }
-
-  // diagonal check
-  for(row = 0; row < nRows - 2; ++row) {
-    for(column = 0; column < nCols - 2; ++column) {
-      if(board[row + 0][column + 0] == 1)
-        if(board[row + 1][column + 1] == 1)
-          if(board[row + 2][column + 2] == 1) {
-            return 1;
-          }
-    }
-  }
-
-  return 0;
+  return checkWin(1, nRows, nCols, board);
 }
 
 int checkTwoWin(int nRows, int nCols, int board[nRows][nCols]) {
+  return checkWin(2, nRows, nCols, board);
+}
+
+int checkWin(int player, int nRows, int nCols, int board[nRows][nCols]) {
   auto int row, column;
 
   /* player one win condition(s) */
   // horizontal check
   for(row = 0; row < nRows; ++row) {
     for(column = 0; column < nCols - 2; ++column) {
-      if(board[row][column + 0] == 2)
-        if(board[row][column + 1] == 2)
-          if(board[row][column + 2] == 2) {
-            return 2;
+      if(board[row][column + 0] == player)
+        if(board[row][column + 1] == player)
+          if(board[row][column + 2] == player) {
+            return player;
           }
     }
   }
@@ -213,10 +182,10 @@ int checkTwoWin(int nRows, int nCols, int board[nRows][nCols]) {
   // vertical check
   for(column = 0; column < nCols; ++column) {
     for(row = 0; row < nRows - 2; ++row) {
-      if(board[row + 0][column] == 2)
-        if(board[row + 1][column] == 2)
-          if(board[row + 2][column] == 2) {
-            return 2;
+      if(board[row + 0][column] == player)
+        if(board[row + 1][column] == player)
+          if(board[row + 2][column] == player) {
+            return player;
           }
     }
   }
@@ -224,10 +193,10 @@ int checkTwoWin(int nRows, int nCols, int board[nRows][nCols]) {
   // diagonal check
   for(row = 0; row < nRows - 2; ++row) {
     for(column = 0; column < nCols - 2; ++column) {
-      if(board[row + 0][column + 0] == 2)
-        if(board[row + 1][column + 1] == 2)
-          if(board[row + 2][column + 2] == 2) {
-            return 2;
+      if(board[row + 0][column + 0] == player)
+        if(board[row + 1][column + 1] == player)
+          if(board[row + 2][column + 2] == player) {
+            return player;
           }
     }
   }
